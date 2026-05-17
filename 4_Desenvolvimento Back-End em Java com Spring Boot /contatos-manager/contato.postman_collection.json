@@ -1,0 +1,29 @@
+{
+	"info": {
+		"_postman_id": "51652b86-06ec-4bed-8152-573fc7d177c4",
+		"name": "contato",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "33176181"
+	},
+	"item": [
+		{
+			"name": "http://localhost:8080/",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/contato",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"contato"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
