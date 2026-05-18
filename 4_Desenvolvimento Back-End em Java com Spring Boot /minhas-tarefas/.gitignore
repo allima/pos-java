@@ -342,3 +342,6 @@ replay_pid*
 
 # End of https://www.toptal.com/developers/gitignore/api/eclipse,java,intellij,intellij+all,intellij+iml,visualstudiocode
 
+/.classpath
+/.project
+/target/
