@@ -2,66 +2,98 @@ package br.com.ropalon.tarefas.model;
 
 import java.time.LocalDate;
 
+import jakarta.persistence.Column;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.Table;
+
+@Entity
+@Table(name = "tarefas")
 public class Tarefa {
 
-    private String descricao;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private Integer id;
 
-    private TarefaStatus status;
+	@Column(name = "ds_tarefas", nullable = false, length = 150)
+	private String descricao;
 
-    private LocalDate dataEntrega;
+	@Enumerated(EnumType.STRING)
+	private TarefaStatus status;
 
-    private boolean visivel;
+	private LocalDate dataEntrega;
 
-    private TarefaCategoria categoria;
+	private boolean visivel;
 
-    private Usuario usuario;
 
-    public String getDescricao() {
-        return descricao;
-    }
+	@ManyToOne
+	@JoinColumn(nullable = false)
+	private TarefaCategoria categoria;
+	@ManyToOne
+	@JoinColumn(nullable = false)
+	private Usuario usuario;
+	
+	
+	public Integer getId() {
+		return id;
+	}
 
-    public void setDescricao(String descricao) {
-        this.descricao = descricao;
-    }
+	public void setId(Integer id) {
+		this.id = id;
+	}
 
-    public TarefaStatus getStatus() {
-        return status;
-    }
+	public String getDescricao() {
+		return descricao;
+	}
 
-    public void setStatus(TarefaStatus status) {
-        this.status = status;
-    }
+	public void setDescricao(String descricao) {
+		this.descricao = descricao;
+	}
 
-    public LocalDate getDataEntrega() {
-        return dataEntrega;
-    }
+	public TarefaStatus getStatus() {
+		return status;
+	}
 
-    public void setDataEntrega(LocalDate dataEntrega) {
-        this.dataEntrega = dataEntrega;
-    }
+	public void setStatus(TarefaStatus status) {
+		this.status = status;
+	}
 
-    public boolean isVisivel() {
-        return visivel;
-    }
+	public LocalDate getDataEntrega() {
+		return dataEntrega;
+	}
 
-    public void setVisivel(boolean visivel) {
-        this.visivel = visivel;
-    }
+	public void setDataEntrega(LocalDate dataEntrega) {
+		this.dataEntrega = dataEntrega;
+	}
 
-    public TarefaCategoria getCategoria() {
-        return categoria;
-    }
+	public boolean isVisivel() {
+		return visivel;
+	}
 
-    public void setCategoria(TarefaCategoria categoria) {
-        this.categoria = categoria;
-    }
+	public void setVisivel(boolean visivel) {
+		this.visivel = visivel;
+	}
 
-    public Usuario getUsuario() {
-        return usuario;
-    }
+	public TarefaCategoria getCategoria() {
+		return categoria;
+	}
 
-    public void setUsuario(Usuario usuario) {
-        this.usuario = usuario;
-    }
+	public void setCategoria(TarefaCategoria categoria) {
+		this.categoria = categoria;
+	}
+
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
+	}
 
 }

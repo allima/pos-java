@@ -1,20 +1,25 @@
 package br.com.ropalon.tarefas.model;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 
 @Entity
-@Table(name = "tarefas_categoria")
-public class TarefaCategoria {
-	
+@Table(name = "roles")
+public class Role {
+
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
-    private String nome;
+	@Enumerated(EnumType.STRING)
+	@Column(length = 50)
+	private ERole name;
 
 	public Integer getId() {
 		return id;
@@ -24,11 +29,12 @@ public class TarefaCategoria {
 		this.id = id;
 	}
 
-    public String getNome() {
-        return nome;
-    }
+	public ERole getName() {
+		return name;
+	}
 
-    public void setNome(String nome) {
-        this.nome = nome;
-    }
+	public void setName(ERole name) {
+		this.name = name;
+	}
+
 }
