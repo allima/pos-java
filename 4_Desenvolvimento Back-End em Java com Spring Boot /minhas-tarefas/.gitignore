@@ -345,3 +345,4 @@ replay_pid*
 /.classpath
 /.project
 /target/
+***/META-INF/

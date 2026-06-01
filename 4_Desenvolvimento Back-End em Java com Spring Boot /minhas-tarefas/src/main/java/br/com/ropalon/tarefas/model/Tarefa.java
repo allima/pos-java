@@ -11,10 +11,13 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.NamedEntityGraph;
+import jakarta.persistence.NamedQuery;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "tarefas")
+@NamedQuery(name="Tarefa.terafasPorCategoria",query = "select t from Tarefa t inner join t.categoria c where c.nome = :nomeCategoria")
 public class Tarefa {
 
 	@Id

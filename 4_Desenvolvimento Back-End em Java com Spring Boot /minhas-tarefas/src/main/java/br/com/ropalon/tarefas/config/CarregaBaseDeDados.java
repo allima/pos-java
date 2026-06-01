@@ -19,7 +19,6 @@ import br.com.ropalon.tarefas.repository.UsuarioRepository;
 @Profile("dev")
 public class CarregaBaseDeDados {
 
-	// use final fields for constructor injection
 	private final UsuarioRepository usuarioRepository;
 	private final TarefaCategoriaRepository categoriaRepository;
 	private final TarefaRepository tarefaRepository;
@@ -33,7 +32,7 @@ public class CarregaBaseDeDados {
 
 	@Bean
 	CommandLineRunner executar() {
-		return args -> {
+		return _ -> {
 			Usuario usuario = new Usuario();
 			usuario.setNome("João");
 			usuario.setSenha("123456");
@@ -48,12 +47,20 @@ public class CarregaBaseDeDados {
 			tarefa.setVisivel(true);
 			tarefa.setCategoria(categoria);
 			tarefa.setUsuario(usuario);
-			// Persist the entities so they are stored in the database. It's necessary to save
-			// usuario and categoria before saving tarefa because Tarefa has @ManyToOne
-			// relations with non-nullable join columns.
+
+			Tarefa tarefa2 = new Tarefa();
+			tarefa2.setDescricao("Estudar Spring Data JPA");
+			tarefa2.setDataEntrega(LocalDate.now().plusDays(7));
+			tarefa2.setStatus(TarefaStatus.ABERTO);
+			tarefa2.setVisivel(true);
+			tarefa2.setCategoria(categoria);
+			tarefa2.setUsuario(usuario);
+
 			usuarioRepository.save(usuario);
 			categoriaRepository.save(categoria);
 			tarefaRepository.save(tarefa);
+			tarefaRepository.save(tarefa2);
+
 		};
 	}
 }
