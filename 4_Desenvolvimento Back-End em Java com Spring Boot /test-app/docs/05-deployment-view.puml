@@ -1,0 +1,32 @@
+@startuml
+!theme plain
+left to right direction
+
+title Deployment View - Payment Microservice
+
+node "Client / API Consumer" as Client
+
+node "Spring Boot App" as App {
+  component "Application" as Application
+  component "Controllers" as Controllers
+  component "Security Layer" as Security
+  component "Services" as Services
+  component "Repositories" as Repos
+  component "AuditAspect" as Audit
+}
+
+database "H2 Database" as H2
+cloud "GCP Pub/Sub" as PubSub
+cloud "Google Cloud Storage" as GCS
+
+Client --> App : HTTPS REST
+Application --> Controllers
+Controllers --> Security
+Controllers --> Services
+Services --> Repos
+Services --> PubSub : publish/subscribe
+Services --> GCS : object upload
+Repos --> H2 : JPA/Hibernate
+Audit --> H2 : save audit logs
+
+@enduml

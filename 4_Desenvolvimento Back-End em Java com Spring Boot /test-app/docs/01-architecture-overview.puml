@@ -1,0 +1,70 @@
+@startuml
+!theme plain
+left to right direction
+
+title Payment Microservice - Architecture Overview
+
+actor "Client App" as Client
+actor "Service Account" as Svc
+
+package "com.app.controller" {
+  [AuthController]
+  [PaymentController]
+}
+
+package "com.app.config / filter" {
+  [SecurityConfig]
+  [JwtAuthenticationFilter]
+}
+
+package "com.app.service" {
+  [JwtService]
+  [CustomUserDetailsService]
+  [PaymentService]
+  [PaymentProcessingService]
+  [PubSubService]
+  [StorageService]
+}
+
+package "com.app.aspect" {
+  [AuditAspect]
+}
+
+package "com.app.repository" {
+  [PaymentRepository]
+  [AuditLogRepository]
+}
+
+database "H2 / JPA" as DB
+queue "GCP Pub/Sub" as PUBSUB
+cloud "GCS Bucket" as GCS
+
+Client --> AuthController : POST /auth/token
+Client --> PaymentController : REST /payments
+Svc --> PaymentController : SERVICE role
+
+AuthController --> JwtService
+AuthController --> CustomUserDetailsService
+
+SecurityConfig --> JwtAuthenticationFilter
+JwtAuthenticationFilter --> JwtService
+JwtAuthenticationFilter --> CustomUserDetailsService
+
+PaymentController --> PaymentService
+PaymentService --> PaymentRepository
+PaymentService --> PubSubService
+PaymentService --> StorageService
+
+PubSubService --> PUBSUB : publish/subscribe
+PubSubService --> PaymentProcessingService : consume event
+PaymentProcessingService --> PaymentRepository
+StorageService --> GCS
+
+PaymentRepository --> DB
+AuditLogRepository --> DB
+
+AuditAspect ..> PaymentController : around()
+AuditAspect ..> PaymentService : around()
+AuditAspect --> AuditLogRepository : persist log
+
+@enduml

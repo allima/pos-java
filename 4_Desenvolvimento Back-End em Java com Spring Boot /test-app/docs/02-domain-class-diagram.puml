@@ -1,0 +1,126 @@
+@startuml
+!theme plain
+skinparam classAttributeIconSize 0
+
+title Payment Microservice - Domain and Service Class Diagram
+
+package "model" {
+  class Payment {
+    +UUID id
+    +String idempotencyKey
+    +UUID pagadorId
+    +BigDecimal valor
+    +String moeda
+    +PaymentMethod method
+    +String descricao
+    +PaymentStatus status
+    +LocalDateTime createdAt
+    +LocalDateTime updatedAt
+    +String attachmentPath
+  }
+
+  class AuditLog {
+    +UUID id
+    +String usuario
+    +String acao
+    +String recurso
+    +LocalDateTime timestamp
+    +String resultado
+    +Long latenciaMs
+    +String metadata
+  }
+
+  enum PaymentMethod {
+    CARTAO
+    CONTA
+  }
+
+  enum PaymentStatus {
+    CRIADO
+    PROCESSANDO
+    CONFIRMADO
+    RECUSADO
+  }
+}
+
+package "dto" {
+  class PaymentRequest {
+    +String idempotencyKey
+    +UUID pagadorId
+    +BigDecimal valor
+    +String moeda
+    +PaymentMethod metodo
+    +String descricao
+    +String anexos
+  }
+
+  class PaymentResponse {
+    +UUID paymentId
+    +String idempotencyKey
+    +UUID pagadorId
+    +BigDecimal valor
+    +String moeda
+    +PaymentMethod metodo
+    +String descricao
+    +PaymentStatus status
+    +LocalDateTime createdAt
+  }
+
+  class PaymentEvent {
+    +UUID paymentId
+    +UUID pagadorId
+    +BigDecimal valor
+    +String moeda
+    +PaymentMethod method
+    +String idempotencyKey
+  }
+
+  class AuthTokenRequest {
+    +String username
+    +String password
+  }
+
+  class AuthTokenResponse {
+    +String token
+    +String tokenType
+    +Long expiresIn
+  }
+}
+
+package "repository" {
+  interface PaymentRepository
+  interface AuditLogRepository
+}
+
+package "service" {
+  class PaymentService
+  class PaymentProcessingService
+  class PubSubService
+  class StorageService
+  class JwtService
+  class CustomUserDetailsService
+}
+
+Payment --> PaymentMethod
+Payment --> PaymentStatus
+PaymentRequest --> PaymentMethod
+PaymentResponse --> PaymentMethod
+PaymentResponse --> PaymentStatus
+PaymentEvent --> PaymentMethod
+
+PaymentService ..> PaymentRequest
+PaymentService ..> PaymentResponse
+PaymentService ..> PaymentEvent
+PaymentService --> PaymentRepository
+PaymentService --> PubSubService
+PaymentService --> StorageService
+
+PaymentProcessingService ..> PaymentEvent
+PaymentProcessingService --> PaymentRepository
+
+PubSubService ..> PaymentEvent
+PubSubService --> PaymentProcessingService
+
+JwtService ..> AuthTokenResponse
+
+@enduml

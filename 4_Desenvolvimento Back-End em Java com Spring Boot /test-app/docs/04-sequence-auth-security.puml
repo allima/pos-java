@@ -1,0 +1,36 @@
+@startuml
+!theme plain
+
+title Sequence - Auth Token and JWT Authorization
+
+autonumber
+actor Client
+participant AuthController
+participant "AuthenticationManager" as AuthManager
+participant CustomUserDetailsService as UserService
+participant JwtService
+participant JwtAuthenticationFilter as JwtFilter
+participant PaymentController
+
+Client -> AuthController : POST /auth/token (username,password)
+AuthController -> AuthManager : authenticate(credentials)
+AuthManager -> UserService : loadUserByUsername(username)
+UserService --> AuthManager : UserDetails
+AuthManager --> AuthController : authenticated
+AuthController -> JwtService : generateToken(userDetails)
+JwtService --> AuthController : JWT
+AuthController --> Client : 200 {token, Bearer, expiresIn}
+
+Client -> JwtFilter : Request /payments + Authorization: Bearer <jwt>
+JwtFilter -> JwtService : extractUsername(jwt)
+JwtFilter -> UserService : loadUserByUsername(username)
+JwtFilter -> JwtService : validateToken(jwt, userDetails)
+alt valid token
+  JwtFilter -> JwtFilter : set SecurityContext
+  JwtFilter -> PaymentController : continue filter chain
+  PaymentController --> Client : 200/4xx/5xx
+else invalid token
+  JwtFilter --> Client : unauthorized/forbidden
+end
+
+@enduml

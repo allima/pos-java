@@ -1,0 +1,48 @@
+@startuml
+!theme plain
+
+title Sequence - Create Payment and Async Processing
+
+autonumber
+actor Client
+participant PaymentController
+participant PaymentService
+database PaymentRepository
+participant StorageService
+participant PubSubService
+queue "GCP Pub/Sub" as Topic
+participant PaymentProcessingService
+
+Client -> PaymentController : POST /payments (PaymentRequest)
+PaymentController -> PaymentService : createPayment(request)
+
+PaymentService -> PaymentRepository : findByIdempotencyKey(key)
+alt payment already exists
+  PaymentRepository --> PaymentService : Payment
+  PaymentService --> PaymentController : PaymentResponse(existing)
+  PaymentController --> Client : 200 OK
+else new payment
+  PaymentService -> PaymentRepository : save(Payment: CRIADO)
+  PaymentRepository --> PaymentService : Payment(id)
+  PaymentService -> PubSubService : publishPaymentCreated(PaymentEvent)
+  PubSubService -> Topic : publish(event)
+
+  opt request has anexos
+    PaymentService -> StorageService : uploadAttachment(base64,paymentId,contentType)
+    StorageService --> PaymentService : gs://bucket/object
+    PaymentService -> PaymentRepository : save(attachmentPath)
+  end
+
+  PaymentService --> PaymentController : PaymentResponse
+  PaymentController --> Client : 200 OK
+end
+
+== Async consumer ==
+Topic -> PubSubService : subscribed message
+PubSubService -> PaymentProcessingService : processPayment(event)
+PaymentProcessingService -> PaymentRepository : findById(paymentId)
+PaymentProcessingService -> PaymentRepository : save(status=PROCESSANDO)
+PaymentProcessingService -> PaymentRepository : save(status=CONFIRMADO|RECUSADO)
+PubSubService -> Topic : ack/nack
+
+@enduml

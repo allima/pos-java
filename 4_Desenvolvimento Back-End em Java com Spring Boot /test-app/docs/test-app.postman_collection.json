@@ -1,0 +1,225 @@
+{
+  "info": {
+    "_postman_id": "b0c03ad1-f3dd-4b9a-9be5-91eb75b23c20",
+    "name": "test-app API Collection",
+    "description": "Collection das APIs do projeto test-app (Spring Boot). Inclui autenticacao JWT e endpoints de pagamentos.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "token",
+      "value": ""
+    },
+    {
+      "key": "paymentId",
+      "value": ""
+    },
+    {
+      "key": "idempotencyKey",
+      "value": "idem-001"
+    }
+  ],
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Gerar Token",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"username\": \"service\",\n  \"password\": \"service123\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/auth/token",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "auth",
+                "token"
+              ]
+            },
+            "description": "Gera token JWT para consumir endpoints protegidos. Usuarios disponiveis no projeto: admin/admin123, analyst/analyst123, service/service123."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "if (json && json.token) {",
+                  "  pm.collectionVariables.set('token', json.token);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "Payments",
+      "item": [
+        {
+          "name": "Criar Pagamento",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"idempotencyKey\": \"{{idempotencyKey}}\",\n  \"pagadorId\": \"11111111-1111-1111-1111-111111111111\",\n  \"valor\": 150.75,\n  \"moeda\": \"BRL\",\n  \"metodo\": \"CARTAO\",\n  \"descricao\": \"Pagamento de teste\",\n  \"anexos\": \"\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/payments",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments"
+              ]
+            },
+            "description": "Cria pagamento e publica evento para processamento assincrono. Requer role SERVICE ou ADMIN."
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test('Status 200', function () {",
+                  "  pm.response.to.have.status(200);",
+                  "});",
+                  "",
+                  "var json = pm.response.json();",
+                  "if (json && json.paymentId) {",
+                  "  pm.collectionVariables.set('paymentId', json.paymentId);",
+                  "}"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Buscar Pagamento por ID",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments/{{paymentId}}",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments",
+                "{{paymentId}}"
+              ]
+            },
+            "description": "Consulta pagamento por UUID. Requer role ANALYST ou ADMIN."
+          }
+        },
+        {
+          "name": "Listar Pagamentos (com filtros)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{token}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/payments?status=CRIADO&method=CARTAO&startDate=2026-01-01T00:00:00&endDate=2026-12-31T23:59:59&page=0&size=20",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "payments"
+              ],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "CRIADO"
+                },
+                {
+                  "key": "method",
+                  "value": "CARTAO"
+                },
+                {
+                  "key": "startDate",
+                  "value": "2026-01-01T00:00:00"
+                },
+                {
+                  "key": "endDate",
+                  "value": "2026-12-31T23:59:59"
+                },
+                {
+                  "key": "page",
+                  "value": "0"
+                },
+                {
+                  "key": "size",
+                  "value": "20"
+                }
+              ]
+            },
+            "description": "Lista pagamentos com filtros opcionais. Requer role ANALYST ou ADMIN."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Actuator",
+      "item": [
+        {
+          "name": "Health",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/actuator/health",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "actuator",
+                "health"
+              ]
+            },
+            "description": "Endpoint de healthcheck exposto sem autenticacao."
+          }
+        }
+      ]
+    }
+  ]
+}
