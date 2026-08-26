@@ -1,0 +1,121 @@
+# Upgrade Plan: pos-java (20260826215354)
+
+- **Generated**: 2026-08-26
+- **HEAD Branch**: main
+- **HEAD Commit ID**: unavailable from version-control status response
+
+## Available Tools
+
+**JDKs**
+- JDK 17.0.20: /usr/lib/jvm/java-17-openjdk-amd64/bin (contatos-manager baseline)
+- JDK 21.0.12: /usr/lib/jvm/java-21-openjdk-amd64/bin (test-app baseline)
+- JDK 25.0.2: /home/alexandre-de-lima/.sdkman/candidates/java/25.0.2-open/bin (target)
+
+**Build Tools**
+- Maven 3.9.16: /home/alexandre-de-lima/.sdkman/candidates/maven/3.9.16/bin
+- Maven Wrappers: present in all three modules; no wrapper properties file found
+
+## Guidelines
+
+> Note: You can add any specific guidelines or constraints for the upgrade process here if needed, bullet points are preferred.
+
+- Run in auto-execution mode.
+- Upgrade the Java runtime target to the latest LTS available on 2026-08-26: Java 25.
+- Preserve application behavior and avoid unrelated dependency upgrades.
+
+## Options
+
+- Working branch: appmod/java-upgrade-20260826215354
+- Run tests before and after the upgrade: true
+
+## Upgrade Goals
+
+- Java 25
+
+## Technology Stack
+
+| Technology/Dependency | Current | Min Compatible Version | Why Incompatible |
+| --------------------- | ------- | ---------------------- | ---------------- |
+| Java: contatos-manager | 17 | 25 | User requested |
+| Java: minhas-tarefas | 25 | 25 | Already satisfies target |
+| Java: test-app | 21 | 25 | User requested |
+| Spring Boot: contatos-manager | 4.0.5 | 4.0.5 | No change required for Java 25 |
+| Spring Boot: minhas-tarefas | 4.0.6 | 4.0.6 | No change required for Java 25 |
+| Spring Boot: test-app | 3.2.0 | 3.2.0 | Existing code is Java 21-compatible; validate Java 25 runtime explicitly |
+| Maven | 3.9.16 | 3.9+ | Compatible with Java 25 |
+| maven-compiler-plugin: test-app | 3.12.1 | 3.12.1 | Existing plugin supports configured release through javac; validate release 25 |
+| maven-surefire-plugin: test-app | 3.2.5 | 3.2.5 | Existing plugin supports current test setup; validate on Java 25 |
+| Spring Cloud GCP: test-app | 5.8.0 | 5.8.0 | No Java-target change required |
+| JJWT: test-app | 0.11.5 | 0.11.5 | No Java-target change required |
+
+## Derived Upgrades
+
+- Set each module's Maven Java property to 25 so Spring Boot parent compiler configuration targets the Java 25 runtime.
+- Set `maven.compiler.source`, `maven.compiler.target`, and `maven.compiler.release` to 25 in `test-app`, because it explicitly overrides compiler settings.
+- No Kotlin upgrade is required because the workspace contains no Kotlin build configuration.
+- No build-tool upgrade is required because Maven 3.9.16 is available and compatible with Java 25.
+
+## Impact Analysis
+
+### Dependency Changes
+
+| File | Dependency | Current | Action | Target | Reason |
+|------|------------|---------|--------|--------|--------|
+| None | None | - | - | - | Java target change does not require dependency changes |
+
+### Source Code Changes
+
+| File | Location | Current | Required Change | Reason |
+|------|----------|---------|-----------------|--------|
+| None identified | Java sources | Java 17/21-compatible APIs | No source rewrite expected | Scan found no removed JDK API, internal JDK package, or reflection issue |
+
+### Configuration Changes
+
+| File | Property/Setting | Current | Required Change | Reason |
+|------|------------------|---------|-----------------|--------|
+| contatos-manager/pom.xml | `java.version` | 17 | Change to 25 | Maven compiler target |
+| minhas-tarefas/pom.xml | `java.version` | 25 | Keep 25 | Already meets target |
+| test-app/pom.xml | `java.version` | 21 | Change to 25 | Maven compiler target |
+| test-app/pom.xml | `maven.compiler.source` | `${java.version}` | Keep property reference | Resolves to 25 after Java target change |
+| test-app/pom.xml | `maven.compiler.target` | `${java.version}` | Keep property reference | Resolves to 25 after Java target change |
+| test-app/pom.xml | `maven.compiler.release` | `${java.version}` | Keep property reference | Resolves to 25 after Java target change |
+| test-app/pom.xml | compiler plugin `<release>` | 21 | Change to `${java.version}` | Removes stale hardcoded Java 21 override |
+
+### CI/CD Changes
+
+| File | Location | Current | Required Change |
+|------|----------|---------|-----------------|
+| None identified | Workspace CI/CD | No hardcoded runtime configuration found in project modules | None |
+
+### Risks & Warnings
+
+- **Spring Boot 3.2.0 on Java 25**: This is older than the Java 25 release line and may expose runtime or dependency compatibility issues even if compilation succeeds. **Mitigation**: run clean test-compile and the complete test suite under Java 25; retain the existing framework version unless tests demonstrate a concrete blocker.
+- **Explicit compiler release in test-app**: The plugin configuration hardcodes release 21 and would otherwise leave the project inconsistent. **Mitigation**: replace it with `${java.version}` and verify generated bytecode compilation under Java 25.
+- **IDE metadata**: `test-app/.idea` records Java 21, but it is generated IDE state rather than Maven build configuration. **Mitigation**: do not alter unrelated IDE metadata; Maven remains the source of truth.
+
+## Upgrade Steps
+
+- Step 1: Setup Environment
+  - **Rationale**: Confirm the installed Java 25 and Maven 3.9.16 toolchain.
+  - **Changes to Make**: Use the available JDK 25 and Maven 3.9.16.
+  - **Verification**: List JDKs and Maven; expected Java 25 and Maven 3.9.16 available.
+
+- Step 2: Setup Baseline
+  - **Rationale**: Establish compilation and test status for each module before changing Java targets.
+  - **Changes to Make**: None.
+  - **Verification**: For each module, run `mvn clean compile test-compile -q && mvn clean test -q` with its current JDK; record results.
+
+- Step 3: Upgrade Java Targets
+  - **Rationale**: Apply the requested Java 25 target consistently to all Maven applications.
+  - **Changes to Make**: Apply all Configuration Changes above; leave `minhas-tarefas` unchanged because it already targets 25.
+  - **Verification**: Run `mvn clean test-compile -q` in each module with JDK 25; expected success.
+
+- Step 4: CVE Validation & Fix
+  - **Rationale**: Confirm direct dependencies remain free of known vulnerabilities after the target change.
+  - **Changes to Make**: Extract direct dependencies and upgrade only dependencies reported with available fixes.
+  - **Verification**: Compile and re-scan; expected no unresolved fixable CVEs.
+
+- Step 5: Final Validation
+  - **Rationale**: Prove the Java 25 target and full behavior across all modules.
+  - **Changes to Make**: Resolve any Java 25 compilation or test failures and remove temporary workarounds.
+  - **Verification**: Run clean test-compile and clean test for all modules with JDK 25; expected 100% tests passing.
