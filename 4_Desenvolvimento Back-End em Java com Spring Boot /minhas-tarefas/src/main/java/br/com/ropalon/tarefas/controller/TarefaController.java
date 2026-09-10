@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ropalon.tarefas.model.Tarefa;
 import br.com.ropalon.tarefas.repository.TarefaRepository;
+import jakarta.validation.Valid;
 
 @RequestMapping("/tarefa")
 @RestController
@@ -42,7 +43,7 @@ public class TarefaController {
 	}
 
 	@PostMapping
-	public Tarefa criarTarefa(@RequestBody Tarefa tarefa) {
+	public Tarefa criarTarefa(@Valid @RequestBody Tarefa tarefa) {
 		return tarefaRepository.save(tarefa);
 	}
 
