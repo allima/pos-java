@@ -56,10 +56,19 @@ public class CarregaBaseDeDados {
 			tarefa2.setCategoria(categoria);
 			tarefa2.setUsuario(usuario);
 
+			Tarefa tarefa3 = new Tarefa();
+			tarefa3.setDescricao("Estudar Spring Security");
+			tarefa3.setDataEntrega(LocalDate.now().plusDays(7));
+			tarefa3.setStatus(TarefaStatus.ABERTO);
+			tarefa3.setVisivel(true);
+			tarefa3.setCategoria(categoria);
+			tarefa3.setUsuario(usuario);
+
 			usuarioRepository.save(usuario);
 			categoriaRepository.save(categoria);
 			tarefaRepository.save(tarefa);
 			tarefaRepository.save(tarefa2);
+			tarefaRepository.save(tarefa3);
 
 		};
 	}

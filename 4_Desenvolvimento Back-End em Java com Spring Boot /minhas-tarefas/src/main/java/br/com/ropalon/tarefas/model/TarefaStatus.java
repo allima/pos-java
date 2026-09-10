@@ -2,6 +2,6 @@ package br.com.ropalon.tarefas.model;
 
 public enum TarefaStatus {
 
-    ABERTO, EM_ANDAMENTO, CANCELADO
+    ABERTO, EM_ANDAMENTO, CANCELADO, CONCLUIDA
 
 }
