@@ -15,6 +15,8 @@ import br.com.ropalon.tarefas.repository.TarefaCategoriaRepository;
 import br.com.ropalon.tarefas.repository.TarefaRepository;
 import br.com.ropalon.tarefas.repository.UsuarioRepository;
 
+
+
 @Configuration
 @Profile("dev")
 public class CarregaBaseDeDados {
