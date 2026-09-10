@@ -26,15 +26,15 @@ public class Tarefa {
 	@GeneratedValue(strategy = GenerationType.AUTO)
 	private Integer id;
 
-	@NotBlank(message = "A descrição da tarefa é obrigatória")
-	@Size(min = 5, max = 150, message = "A descrição da tarefa deve ter entre 5 e 150 caracteres")
+	@NotBlank(message = "{tarefa.descricao.not_blank}")
+	@Size(min = 5, max = 150, message = "{tarefa.descricao.size}")
 	@Column(name = "ds_tarefas", nullable = false, length = 150)
 	private String descricao;
 
 	@Enumerated(EnumType.STRING)
 	private TarefaStatus status;
 
-	@FutureOrPresent(message = "A data de entrega deve ser no futuro ou presente")
+	@FutureOrPresent(message = "{tarefa.descricao.future-or-present}")
 	private LocalDate dataEntrega;
 
 	private boolean visivel;
