@@ -62,6 +62,23 @@ class TarefaServiceIntegrationTest {
 			tarefaService.cancelarTarefaPorId(3)
 		);
 	}
+
+	@Test
+	void deveConcluirTarefaPorId() {
+		// a massa de dados (perfil dev) carrega a tarefa com id 3 como ABERTO
+		Tarefa tarefa = tarefaService.buscarTarefaPorId(3);
+		Assertions.assertNotEquals(TarefaStatus.CONCLUIDA, tarefa.getStatus());
+		Tarefa tarefaConcluida = tarefaService.concluirTarefaPorId(3);
+		Assertions.assertEquals(TarefaStatus.CONCLUIDA, tarefaConcluida.getStatus());
+	}
+
+	@Test
+	void deveCancelarTarefaPorId() {
+		Tarefa tarefa = tarefaService.buscarTarefaPorId(3);
+		Assertions.assertNotEquals(TarefaStatus.CANCELADO, tarefa.getStatus());
+		Tarefa tarefaCancelada = tarefaService.cancelarTarefaPorId(3);
+		Assertions.assertEquals(TarefaStatus.CANCELADO, tarefaCancelada.getStatus());
+	}
 	
 	
 	
