@@ -15,10 +15,9 @@ import br.com.ropalon.tarefas.model.TarefaStatus;
 @ActiveProfiles("dev")
 @Transactional
 class TarefaServiceIntegrationTest {
-	
+
 	@Autowired
-	private  TarefaService tarefaService ;
-	
+	private TarefaService tarefaService;
 
 	@Test
 	void deveIniciarTarefaPorId() {
@@ -26,41 +25,31 @@ class TarefaServiceIntegrationTest {
 		Assertions.assertEquals(tarefaIniciada.getStatus(), TarefaStatus.EM_ANDAMENTO);
 	}
 
-	
-	
 	@Test
 	void naoDeveIniciarTarefaConcluida() {
 		Tarefa tarefa = tarefaService.buscarTarefaPorId(3);
 		tarefa.setStatus(TarefaStatus.CONCLUIDA);
 		tarefaService.salvarTarefa(tarefa);
 
-		Assertions.assertThrows(TarefaStatusException.class, () -> 
-			tarefaService.iniciarTarefaPorId(3)
-		);
+		Assertions.assertThrows(TarefaStatusException.class, () -> tarefaService.iniciarTarefaPorId(3));
 	}
-	
-	
+
 	@Test
 	void naoDeveConcluirTarefaConcluida() {
 		Tarefa tarefa = tarefaService.buscarTarefaPorId(3);
 		tarefa.setStatus(TarefaStatus.CONCLUIDA);
 		tarefaService.salvarTarefa(tarefa);
 
-		Assertions.assertThrows(TarefaStatusException.class, () -> 
-			tarefaService.concluirTarefaPorId(3)
-		);
+		Assertions.assertThrows(TarefaStatusException.class, () -> tarefaService.concluirTarefaPorId(3));
 	}
-	
-	
+
 	@Test
 	void naoDeveCancelarTarefaConcluida() {
 		Tarefa tarefa = tarefaService.buscarTarefaPorId(3);
 		tarefa.setStatus(TarefaStatus.CONCLUIDA);
 		tarefaService.salvarTarefa(tarefa);
 
-		Assertions.assertThrows(TarefaStatusException.class, () -> 
-			tarefaService.cancelarTarefaPorId(3)
-		);
+		Assertions.assertThrows(TarefaStatusException.class, () -> tarefaService.cancelarTarefaPorId(3));
 	}
 
 	@Test
@@ -79,9 +68,5 @@ class TarefaServiceIntegrationTest {
 		Tarefa tarefaCancelada = tarefaService.cancelarTarefaPorId(3);
 		Assertions.assertEquals(TarefaStatus.CANCELADO, tarefaCancelada.getStatus());
 	}
-	
-	
-	
-	
-	
+
 }

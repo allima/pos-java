@@ -47,7 +47,6 @@ class TarefaRepositoryTest {
 		List<Tarefa> tarefas = tarefaRepository.findByNomeCategoria("Estudos");
 		Assertions.assertNotNull(tarefas);
 		Assertions.assertEquals(3, tarefas.size());
-
 	}
 
 	@Test
@@ -55,6 +54,5 @@ class TarefaRepositoryTest {
 		List<Tarefa> tarefas = tarefaRepository.terafasPorCategoria("Estudos");
 		Assertions.assertNotNull(tarefas);
 		Assertions.assertEquals(3, tarefas.size());
-
 	}
 }

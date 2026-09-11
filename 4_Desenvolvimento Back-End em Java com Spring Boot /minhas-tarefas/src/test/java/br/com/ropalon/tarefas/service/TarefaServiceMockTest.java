@@ -34,8 +34,7 @@ class TarefaServiceMockTest {
 		tarefa.setDescricao("Tarefa de teste");
 		Mockito.when(repository.findById(any())).thenReturn(Optional.of(tarefa));
 
-		Assertions.assertThrows(TarefaStatusException.class, 
-				() -> service.concluirTarefaPorId(1));
+		Assertions.assertThrows(TarefaStatusException.class, () -> service.concluirTarefaPorId(1));
 
 	}
 
@@ -47,9 +46,8 @@ class TarefaServiceMockTest {
 		tarefa.setStatus(TarefaStatus.CONCLUIDA);
 		tarefa.setDescricao("Tarefa de teste");
 		Mockito.when(repository.findById(any())).thenReturn(Optional.of(tarefa));
-		
-		Assertions.assertThrows(TarefaStatusException.class, 
-				() -> service.cancelarTarefaPorId(1));
+
+		Assertions.assertThrows(TarefaStatusException.class, () -> service.cancelarTarefaPorId(1));
 
 	}
 
