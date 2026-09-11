@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.ropalon.tarefas.controller.assembler.TarefaCategoriaModelAssembler;
 import br.com.ropalon.tarefas.mapper.TarefaCategoriaMapper;
+import br.com.ropalon.tarefas.model.TarefaCategoria;
 import br.com.ropalon.tarefas.model.dto.TarefaCategoriaRequest;
 import br.com.ropalon.tarefas.model.dto.TarefaCategoriaResponse;
 import br.com.ropalon.tarefas.service.TarefaCategoriaService;
@@ -27,26 +30,28 @@ public class TarefaCategoriaController {
 
 	private final TarefaCategoriaService service;
 	private final TarefaCategoriaMapper mapper;
+	private final TarefaCategoriaModelAssembler assembler;
 
-	public TarefaCategoriaController(TarefaCategoriaService service, TarefaCategoriaMapper mapper) {
+	public TarefaCategoriaController(TarefaCategoriaService service, TarefaCategoriaMapper mapper,
+			TarefaCategoriaModelAssembler assembler) {
 		this.service = service;
 		this.mapper = mapper;
+		this.assembler = assembler;
 	}
 
 	@GetMapping
-	public List<TarefaCategoriaResponse> todasCategorias() {
-		return mapper.toTarefaCategoriaResponseList(service.todasCategorias());
+	public CollectionModel<EntityModel<TarefaCategoriaResponse>> todasCategorias() {
+		List<TarefaCategoria> categorias = service.todasCategorias();
+		var categoriaModels = categorias.stream().map(assembler::toModel).toList();
+
+		return CollectionModel.of(categoriaModels,
+				linkTo(methodOn(TarefaCategoriaController.class).todasCategorias()).withSelfRel());
 	}
 
 	@GetMapping("/{id}")
 	public EntityModel<TarefaCategoriaResponse> umaCategoria(@PathVariable Integer id) {
-		var categoriaResponse = mapper.toTarefaCategoriaResponse(service.buscarCategoriaPorId(id));
-		
-		EntityModel<TarefaCategoriaResponse> categoriaModel = EntityModel.of(categoriaResponse,
-				linkTo(methodOn(TarefaCategoriaController.class).umaCategoria(id)).withSelfRel(),
-				linkTo(methodOn(TarefaCategoriaController.class).todasCategorias()).withRel("caregorias"));	
-		
-		return categoriaModel;
+		var categoria = service.buscarCategoriaPorId(id);
+		return assembler.toModel(categoria);
 	}
 
 	@PostMapping

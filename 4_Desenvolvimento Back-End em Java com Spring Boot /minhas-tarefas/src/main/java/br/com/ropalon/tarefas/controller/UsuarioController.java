@@ -5,6 +5,7 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 
 import java.util.List;
 
+import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,7 +16,9 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.ropalon.tarefas.controller.assembler.UsuarioModelAssembler;
 import br.com.ropalon.tarefas.mapper.UsuarioMapper;
+import br.com.ropalon.tarefas.model.Usuario;
 import br.com.ropalon.tarefas.model.dto.UsuarioRequest;
 import br.com.ropalon.tarefas.model.dto.UsuarioResponse;
 import br.com.ropalon.tarefas.service.UsuarioService;
@@ -27,27 +30,27 @@ public class UsuarioController {
 
 	private final UsuarioService service;
 	private final UsuarioMapper mapper;
+	private final UsuarioModelAssembler assembler;
 
-	public UsuarioController(UsuarioService service, UsuarioMapper mapper) {
+	public UsuarioController(UsuarioService service, UsuarioMapper mapper, UsuarioModelAssembler assembler) {
 		this.service = service;
 		this.mapper = mapper;
+		this.assembler = assembler;
 	}
 
 	@GetMapping
-	public List<UsuarioResponse> todosUsuarios() {
-		return mapper.toUsuarioResponseList(service.todosUsuarios());
+	public CollectionModel<EntityModel<UsuarioResponse>> todosUsuarios() {
+		List<Usuario> usuarios = service.todosUsuarios();
+		var usuarioModels = usuarios.stream().map(assembler::toModel).toList();
+
+		return CollectionModel.of(usuarioModels,
+				linkTo(methodOn(UsuarioController.class).todosUsuarios()).withSelfRel());
 	}
 
 	@GetMapping("/{id}")
 	public EntityModel<UsuarioResponse> umUsuario(@PathVariable Integer id) {
 		var usuario = service.buscarUsuarioPorId(id);
-		var usuarioResponse = mapper.toUsuarioResponse(usuario);
-
-		EntityModel<UsuarioResponse> usuarioModel = EntityModel.of(usuarioResponse,
-				linkTo(methodOn(UsuarioController.class).umUsuario(id)).withSelfRel(),
-				linkTo(methodOn(UsuarioController.class).todosUsuarios()).withRel("usuarios"));
-
-		return usuarioModel;
+		return assembler.toModel(usuario);
 	}
 
 	@PostMapping
