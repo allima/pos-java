@@ -19,6 +19,8 @@ public interface TarefasMapper {
 
 	List<TarefaResponse> toTarefasResponseList(List<Tarefa> tarefas);
 
-	Tarefa toTarefa(TarefaRequest tarefa);
+	@Mapping(source = "categoriaId", target = "categoria.id")
+	@Mapping(source = "usuarioId", target = "usuario.id")
+	Tarefa toTarefa(TarefaRequest tarefaRequest);
 
 }
