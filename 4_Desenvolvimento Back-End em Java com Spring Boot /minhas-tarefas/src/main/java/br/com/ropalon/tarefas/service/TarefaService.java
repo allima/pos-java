@@ -78,6 +78,13 @@ public class TarefaService {
 		return tarefa;
 	}
 	
-	
-	
+	public Tarefa atualizarTarefa(Integer id, Tarefa tarefa) {
+		Tarefa tarefaExistente = buscarTarefaPorId(id);
+		tarefaExistente.setDescricao(tarefa.getDescricao());
+		tarefaExistente.setDataEntrega(tarefa.getDataEntrega());
+		tarefaExistente.setCategoria(tarefa.getCategoria());
+		tarefaExistente.setUsuario(tarefa.getUsuario());
+		return tarefaRepository.save(tarefaExistente);
+	}
+
 }

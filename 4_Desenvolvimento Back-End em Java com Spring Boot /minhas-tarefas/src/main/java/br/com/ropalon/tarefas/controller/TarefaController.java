@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -62,18 +63,11 @@ public class TarefaController {
 	public void deletarTarefa(@PathVariable Integer id) {
 		service.deletarTarefa(id);
 	}
-
-//	@PutMapping("/{id}")
-//	public Tarefa atualizarTarefa(@PathVariable Integer id, @RequestBody Tarefa tarefaAtual) {
-//		return service.buscarTarefaPorId(id).map(tarefa -> {
-//			tarefa.setCategoria(tarefaAtual.getCategoria());
-//			tarefa.setDescricao(tarefaAtual.getDescricao());
-//			tarefa.setStatus(tarefaAtual.getStatus());
-//			tarefa.setDataEntrega(tarefaAtual.getDataEntrega());
-//			tarefa.setVisivel(tarefaAtual.isVisivel());
-//			return service.save(tarefa);
-//		}).orElseThrow(() -> new RuntimeException("Tarefa não encontrada com id: " + id));
-//
-//	}
+	
+	@PutMapping("/{id}")
+	public TarefaResponse atualizarTarefa(@PathVariable Integer id, @Valid @RequestBody TarefaRequest tarefa) {
+		var tarefaAtualizada = mapper.toTarefa(tarefa);
+		return mapper.toTarefaResponse(service.atualizarTarefa(id, tarefaAtualizada));
+	}
 
 }
