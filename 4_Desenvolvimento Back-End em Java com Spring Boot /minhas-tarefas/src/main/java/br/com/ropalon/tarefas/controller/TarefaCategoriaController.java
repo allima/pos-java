@@ -1,7 +1,11 @@
 package br.com.ropalon.tarefas.controller;
 
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
+
 import java.util.List;
 
+import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -35,8 +39,14 @@ public class TarefaCategoriaController {
 	}
 
 	@GetMapping("/{id}")
-	public TarefaCategoriaResponse umaCategoria(@PathVariable Integer id) {
-		return mapper.toTarefaCategoriaResponse(service.buscarCategoriaPorId(id));
+	public EntityModel<TarefaCategoriaResponse> umaCategoria(@PathVariable Integer id) {
+		var categoriaResponse = mapper.toTarefaCategoriaResponse(service.buscarCategoriaPorId(id));
+		
+		EntityModel<TarefaCategoriaResponse> categoriaModel = EntityModel.of(categoriaResponse,
+				linkTo(methodOn(TarefaCategoriaController.class).umaCategoria(id)).withSelfRel(),
+				linkTo(methodOn(TarefaCategoriaController.class).todasCategorias()).withRel("caregorias"));	
+		
+		return categoriaModel;
 	}
 
 	@PostMapping
