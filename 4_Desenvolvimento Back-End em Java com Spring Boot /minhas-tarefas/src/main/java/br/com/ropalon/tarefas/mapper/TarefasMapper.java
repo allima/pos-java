@@ -22,6 +22,7 @@ public interface TarefasMapper {
 	@Mapping(source = "categoriaId", target = "categoria.id")
 	@Mapping(source = "usuarioId", target = "usuario.id")
 	@Mapping(target = "visivel", constant = "false")
+	 @Mapping(target = "status", ignore = true)
 	Tarefa toTarefa(TarefaRequest tarefaRequest);
 
 }
