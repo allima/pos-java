@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import br.com.ropalon.tarefas.mapper.TarefasMapper;
 import br.com.ropalon.tarefas.model.Tarefa;
+import br.com.ropalon.tarefas.model.dto.TarefaRequest;
 import br.com.ropalon.tarefas.model.dto.TarefaResponse;
 import br.com.ropalon.tarefas.service.TarefaService;
 import jakarta.validation.Valid;
@@ -51,8 +52,10 @@ public class TarefaController {
 	}
 
 	@PostMapping
-	public TarefaResponse criarTarefa(@Valid @RequestBody Tarefa tarefa) {
-		return mapper.toTarefaResponse(service.salvarTarefa(tarefa));
+	public TarefaResponse salvarTarefa(@Valid @RequestBody TarefaRequest tarefa) {
+		var tarefaNova = mapper.toTarefa(tarefa);
+		
+		return mapper.toTarefaResponse(service.salvarTarefa(tarefaNova));
 	}
 
 	@DeleteMapping("/{id}")

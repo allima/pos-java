@@ -2,11 +2,10 @@ package br.com.ropalon.tarefas.model.dto;
 
 import java.time.LocalDate;
 
-public record TarefaResponse(Integer id,
+public record TarefaRequest(
+		Integer id, 
 		String descricao, 
-		String status, 
 		LocalDate dataEntrega,
 		Integer categoriaId,
 		Integer usuarioId) {
-
 }

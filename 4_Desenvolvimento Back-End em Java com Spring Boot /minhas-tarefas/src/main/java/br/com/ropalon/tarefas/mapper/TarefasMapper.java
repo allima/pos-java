@@ -6,6 +6,7 @@ import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 
 import br.com.ropalon.tarefas.model.Tarefa;
+import br.com.ropalon.tarefas.model.dto.TarefaRequest;
 import br.com.ropalon.tarefas.model.dto.TarefaResponse;
 
 @Mapper(componentModel = "spring") 
@@ -17,5 +18,7 @@ public interface TarefasMapper {
 	TarefaResponse toTarefaResponse(Tarefa tarefa);
 
 	List<TarefaResponse> toTarefasResponseList(List<Tarefa> tarefas);
+
+	Tarefa toTarefa(TarefaRequest tarefa);
 
 }
