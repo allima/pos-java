@@ -80,5 +80,25 @@ public class TarefaController {
 		var tarefaAtualizada = mapper.toTarefa(tarefa);
 		return mapper.toTarefaResponse(service.atualizarTarefa(id, tarefaAtualizada));
 	}
+	
+	
+	@PutMapping("/{id}/iniciar")
+	public EntityModel<TarefaResponse> iniciarTarefa(@PathVariable Integer id) {
+		var tarefa = service.iniciarTarefaPorId(id);
+		return assembler.toModel(tarefa);
+	}
+	
+	@PutMapping("/{id}/concluir")
+	public EntityModel<TarefaResponse> concluirTarefa(@PathVariable Integer id) {
+		var tarefa = service.concluirTarefaPorId(id);
+		return assembler.toModel(tarefa);
+	}
+	
+	@PutMapping("/{id}/cancelar")
+	public EntityModel<TarefaResponse> cancelarTarefa(@PathVariable Integer id) {
+		var tarefa = service.cancelarTarefaPorId(id);
+		return assembler.toModel(tarefa);
+	}
+	
 
 }
