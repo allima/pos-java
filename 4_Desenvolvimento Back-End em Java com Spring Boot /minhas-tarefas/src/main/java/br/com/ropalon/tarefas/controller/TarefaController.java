@@ -12,7 +12,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import br.com.ropalon.tarefas.mapper.TarefasMapper;
 import br.com.ropalon.tarefas.model.Tarefa;
+import br.com.ropalon.tarefas.model.dto.TarefaResponse;
 import br.com.ropalon.tarefas.service.TarefaService;
 import jakarta.validation.Valid;
 
@@ -21,28 +23,36 @@ import jakarta.validation.Valid;
 public class TarefaController {
 
 	private final TarefaService service;
+	private final TarefasMapper mapper;
 
-	public TarefaController(TarefaService service) {
+	public TarefaController(TarefaService service, TarefasMapper mapper) {
 		this.service = service;
+		this.mapper = mapper;
 	}
 
 	@GetMapping
-	public List<Tarefa> todasTarefas(@RequestParam Map<String, String> parametros) {
+	public List<TarefaResponse> todasTarefas(@RequestParam Map<String, String> parametros) {
+		List<Tarefa> tarefas = List.of();
 		if (parametros.isEmpty()) {
-			return service.todasTarefas();
-		}
+			tarefas= service.todasTarefas();
+		}else {
 		var descricao = parametros.get("descricao");
-		return service.todasTarefasPorDescricao( descricao );
+		tarefas= service.todasTarefasPorDescricao(descricao);
+		}
+		
+		return mapper.toTarefasResponseList(tarefas);
 	}
 
 	@GetMapping("/{id}")
-	public Tarefa umaTarefa(@PathVariable Integer id) {
-		return service.buscarTarefaPorId(id);
+	public TarefaResponse umaTarefa(@PathVariable Integer id) {
+
+		var tarefa = service.buscarTarefaPorId(id);
+		return mapper.toTarefaResponse(tarefa);
 	}
 
 	@PostMapping
-	public Tarefa criarTarefa(@Valid @RequestBody Tarefa tarefa) {
-		return service.salvarTarefa(tarefa);
+	public TarefaResponse criarTarefa(@Valid @RequestBody Tarefa tarefa) {
+		return mapper.toTarefaResponse(service.salvarTarefa(tarefa));
 	}
 
 	@DeleteMapping("/{id}")
