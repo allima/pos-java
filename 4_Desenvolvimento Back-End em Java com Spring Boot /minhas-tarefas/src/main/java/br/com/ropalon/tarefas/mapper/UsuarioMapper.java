@@ -17,6 +17,5 @@ public interface UsuarioMapper {
 	List<UsuarioResponse> toUsuarioResponseList(List<Usuario> usuarios);
 
 	@Mapping(target = "id", ignore = true)
-	@Mapping(target = "tarefas", ignore = true)
 	Usuario toUsuario(UsuarioRequest request);
 }

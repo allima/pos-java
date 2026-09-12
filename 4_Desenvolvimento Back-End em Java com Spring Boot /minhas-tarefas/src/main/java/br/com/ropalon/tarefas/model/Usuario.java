@@ -70,4 +70,12 @@ public class Usuario {
 		this.tarefas = tarefas;
 	}
 
+	public Set<Role> getRoles() {
+		return roles;
+	}
+
+	public void setRoles(Set<Role> roles) {
+		this.roles = roles;
+	}
+
 }
