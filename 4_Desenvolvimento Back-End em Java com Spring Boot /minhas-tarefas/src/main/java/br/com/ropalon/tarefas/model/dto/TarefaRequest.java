@@ -11,7 +11,7 @@ public record TarefaRequest(
 		@NotBlank(message = "{tarefa.descricao.not_blank}")
 		@Size(min = 5, max = 150, message = "{tarefa.descricao.size}")
 		String descricao, 
-		@FutureOrPresent(message = "{tarefa.descricao.future-or-present}")
+		@FutureOrPresent(message = "{tarefa.dataEntrega.future-or-present}")
 		LocalDate dataEntrega,
 		Integer categoriaId,
 		Integer usuarioId) {

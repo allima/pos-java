@@ -34,7 +34,7 @@ public class Tarefa {
 	@Enumerated(EnumType.STRING)
 	private TarefaStatus status = TarefaStatus.ABERTO;
 
-	@FutureOrPresent(message = "{tarefa.descricao.future-or-present}")
+	@FutureOrPresent(message = "{tarefa.dataEntrega.future-or-present}")
 	private LocalDate dataEntrega;
 
 	private boolean visivel;

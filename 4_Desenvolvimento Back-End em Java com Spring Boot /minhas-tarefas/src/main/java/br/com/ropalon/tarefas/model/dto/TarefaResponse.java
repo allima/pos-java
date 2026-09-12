@@ -12,7 +12,7 @@ public record TarefaResponse(Integer id,
 		@Size(min = 5, max = 150, message = "{tarefa.descricao.size}")
 		String descricao, 
 		String status, 
-		@FutureOrPresent(message = "{tarefa.descricao.future-or-present}")
+		@FutureOrPresent(message = "{tarefa.dataEntrega.future-or-present}")
 		LocalDate dataEntrega,
 		@NotBlank(message = "{tarefa.categoria.not_blank}")
 		@Min(value = 1, message = "{tarefa.categoria.min}")
