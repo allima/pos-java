@@ -1,5 +1,6 @@
 package br.com.ropalon.tarefas.service;
 
+import br.com.ropalon.tarefas.exception.RoleInvalidaException;
 import br.com.ropalon.tarefas.model.ERole;
 import br.com.ropalon.tarefas.model.Role;
 import br.com.ropalon.tarefas.model.Usuario;
@@ -37,18 +38,24 @@ public class UsuarioService {
     }
 
     public Usuario salvarUsuario(Usuario usuario) {
+        if (usuario.getSenha() == null || usuario.getSenha().isBlank()) {
+            throw new IllegalArgumentException("A senha é obrigatória.");
+        }
+
         usuario.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        usuario.setRoles(normalizarRoles(usuario.getRoles()));
-        atribuirRolePadraoSeNecessario(usuario);
+        usuario.setRoles(validarRoles(usuario.getRoles()));
         return repository.save(usuario);
     }
 
     public Usuario atualizarUsuario(Integer id, Usuario usuario) {
         Usuario usuarioExistente = buscarUsuarioPorId(id);
         usuarioExistente.setNome(usuario.getNome());
-        usuarioExistente.setSenha(passwordEncoder.encode(usuario.getSenha()));
-        usuarioExistente.setRoles(normalizarRoles(usuario.getRoles()));
-        atribuirRolePadraoSeNecessario(usuarioExistente);
+
+        if (usuario.getSenha() != null && !usuario.getSenha().isBlank()) {
+            usuarioExistente.setSenha(passwordEncoder.encode(usuario.getSenha()));
+        }
+
+        usuarioExistente.setRoles(validarRoles(usuario.getRoles()));
         return repository.save(usuarioExistente);
     }
 
@@ -56,38 +63,24 @@ public class UsuarioService {
         repository.deleteById(id);
     }
 
-    private void atribuirRolePadraoSeNecessario(Usuario usuario) {
-        if (usuario.getRoles() == null || usuario.getRoles().isEmpty()) {
-            var rolePadrao = roleRepository.findByName(ERole.ROLE_USER)
-                    .orElseGet(() -> {
-                        Role role = new Role();
-                        role.setName(ERole.ROLE_USER);
-                        return roleRepository.save(role);
-                    });
-            usuario.setRoles(new HashSet<>(Set.of(rolePadrao)));
+    private Set<Role> validarRoles(Set<Role> roles) {
+        if (roles == null || roles.isEmpty()) {
+            return new HashSet<>(Set.of(obterRolePadrao()));
         }
+
+        Set<Role> validRoles = roles.stream()
+                .map(this::resolucaoRoleValida)
+                .collect(Collectors.toSet());
+
+        return validRoles;
     }
 
-    private Set<Role> normalizarRoles(Set<Role> roles) {
-        return roles.stream()
-                .map(this::resolverRolePersistida)
-                .filter(java.util.Objects::nonNull)
-                .collect(Collectors.toCollection(HashSet::new));
+    private Role resolucaoRoleValida(Role role) {
+        return roleRepository.findByName(role.getName())
+                .orElseThrow(() -> new RoleInvalidaException("Role inválida: " + role.getName()));
     }
 
-    private Role resolverRolePersistida(Role role) {
-        if (role.getId() != null) {
-            return roleRepository.findById(role.getId()).orElseGet(() -> buscarOuSalvarRole(role.getName()));
-        }
-        return buscarOuSalvarRole(role.getName());
-    }
-
-    private Role buscarOuSalvarRole(ERole name) {
-        return roleRepository.findByName(name)
-                .orElseGet(() -> {
-                    Role novaRole = new Role();
-                    novaRole.setName(name);
-                    return roleRepository.save(novaRole);
-                });
+    private Role obterRolePadrao() {
+        return roleRepository.findByName(ERole.ROLE_USER).get();
     }
 }
