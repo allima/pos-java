@@ -9,6 +9,8 @@ import java.util.Map;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -64,10 +66,12 @@ public class TarefaController {
 	}
 
 	@PostMapping
-	public TarefaResponse salvarTarefa(@Valid @RequestBody TarefaRequest tarefa) {
+	public ResponseEntity<EntityModel<TarefaResponse>> salvarTarefa(@Valid @RequestBody TarefaRequest tarefa) {
 		var tarefaNova = mapper.toTarefa(tarefa);
-
-		return mapper.toTarefaResponse(service.salvarTarefa(tarefaNova));
+		var tarefaSalva = service.salvarTarefa(tarefaNova);
+		var tarefaModel = assembler.toModel(tarefaSalva);
+		return ResponseEntity.created(tarefaModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+				.body(tarefaModel);
 	}
 
 	@DeleteMapping("/{id}")
@@ -80,25 +84,23 @@ public class TarefaController {
 		var tarefaAtualizada = mapper.toTarefa(tarefa);
 		return mapper.toTarefaResponse(service.atualizarTarefa(id, tarefaAtualizada));
 	}
-	
-	
+
 	@PutMapping("/{id}/iniciar")
 	public EntityModel<TarefaResponse> iniciarTarefa(@PathVariable Integer id) {
 		var tarefa = service.iniciarTarefaPorId(id);
 		return assembler.toModel(tarefa);
 	}
-	
+
 	@PutMapping("/{id}/concluir")
 	public EntityModel<TarefaResponse> concluirTarefa(@PathVariable Integer id) {
 		var tarefa = service.concluirTarefaPorId(id);
 		return assembler.toModel(tarefa);
 	}
-	
+
 	@PutMapping("/{id}/cancelar")
 	public EntityModel<TarefaResponse> cancelarTarefa(@PathVariable Integer id) {
 		var tarefa = service.cancelarTarefaPorId(id);
 		return assembler.toModel(tarefa);
 	}
-	
 
 }

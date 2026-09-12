@@ -14,6 +14,7 @@ import br.com.ropalon.tarefas.controller.TarefaController;
 import br.com.ropalon.tarefas.controller.UsuarioController;
 import br.com.ropalon.tarefas.mapper.TarefasMapper;
 import br.com.ropalon.tarefas.model.Tarefa;
+import br.com.ropalon.tarefas.model.TarefaStatus;
 import br.com.ropalon.tarefas.model.dto.TarefaResponse;
 
 @Component
@@ -36,6 +37,20 @@ public class TarefaModelAssembler implements RepresentationModelAssembler<Tarefa
 				linkTo(methodOn(TarefaCategoriaController.class).umaCategoria(tarefaref.categoriaId()))
 						.withRel("categorias"),
 				linkTo(methodOn(UsuarioController.class).umUsuario(tarefaref.usuarioId())).withRel("usuarios"));
+
+		if (TarefaStatus.EM_ANDAMENTO.equals(tarefa.getStatus())) {
+			tarefaModel.add(
+					linkTo(methodOn(TarefaController.class).concluirTarefa(tarefa.getId())).withRel("concluir"),
+					linkTo(methodOn(TarefaController.class).cancelarTarefa(tarefa.getId())).withRel("cancelar"));
+
+		} 	
+		if (TarefaStatus.ABERTO.equals(tarefa.getStatus())) {
+			tarefaModel.add(
+					linkTo(methodOn(TarefaController.class).iniciarTarefa(tarefa.getId())).withRel("iniciar")
+					);
+
+		} 
+
 		return tarefaModel;
 	}
 

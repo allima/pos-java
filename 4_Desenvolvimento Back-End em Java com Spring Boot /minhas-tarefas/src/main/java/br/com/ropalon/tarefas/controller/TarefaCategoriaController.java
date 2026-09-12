@@ -7,6 +7,8 @@ import java.util.List;
 
 import org.springframework.hateoas.CollectionModel;
 import org.springframework.hateoas.EntityModel;
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -55,9 +57,13 @@ public class TarefaCategoriaController {
 	}
 
 	@PostMapping
-	public TarefaCategoriaResponse salvarCategoria(@Valid @RequestBody TarefaCategoriaRequest request) {
+	public ResponseEntity<EntityModel<TarefaCategoriaResponse>> salvarCategoria(@Valid @RequestBody TarefaCategoriaRequest request) {
 		var categoria = mapper.toTarefaCategoria(request);
-		return mapper.toTarefaCategoriaResponse(service.salvarCategoria(categoria));
+		var categoriaSalva =service.salvarCategoria(categoria);
+		var categoriaModel=assembler.toModel(categoriaSalva);
+		
+		return ResponseEntity.created(categoriaModel.getRequiredLink(IanaLinkRelations.SELF).toUri())
+				.body(categoriaModel);
 	}
 
 	@DeleteMapping("/{id}")

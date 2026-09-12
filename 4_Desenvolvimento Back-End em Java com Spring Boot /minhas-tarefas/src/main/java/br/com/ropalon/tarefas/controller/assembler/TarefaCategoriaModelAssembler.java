@@ -26,8 +26,11 @@ public class TarefaCategoriaModelAssembler
 	public EntityModel<TarefaCategoriaResponse> toModel(TarefaCategoria categoria) {
 		var categoriaResponse = mapper.toTarefaCategoriaResponse(categoria);
 
-		return EntityModel.of(categoriaResponse,
+		var categoriaModel = EntityModel.of(categoriaResponse,
 				linkTo(methodOn(TarefaCategoriaController.class).umaCategoria(categoriaResponse.id())).withSelfRel(),
 				linkTo(methodOn(TarefaCategoriaController.class).todasCategorias()).withRel("categorias"));
+			
+		return categoriaModel;
+
 	}
 }
